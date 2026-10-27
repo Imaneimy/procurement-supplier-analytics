@@ -1,0 +1,116 @@
+// ============================================================
+// DAX measures — create an empty table "_Measures" (Enter Data, 1 blank column,
+// then delete the column) and add each measure below to it.
+// Reference values to check against (from python src/run_pipeline.py):
+//   Total Spend 1,336 M MAD · On-Time 78.0% · Avg Lead Time 27.3 d · Invoice Match 89.7%
+// ============================================================
+
+// ---------- Volume & spend ----------
+Total Spend = SUM ( fact_purchase_order[po_amount_mad] )
+
+PO Count = COUNTROWS ( fact_purchase_order )
+
+Spend (M MAD) = DIVIDE ( [Total Spend], 1e6 )
+
+Spend Last Year = CALCULATE ( [Total Spend], SAMEPERIODLASTYEAR ( dim_date[Date] ) )
+
+Spend YoY % = DIVIDE ( [Total Spend] - [Spend Last Year], [Spend Last Year] )
+
+Spend YTD = TOTALYTD ( [Total Spend], dim_date[Date] )
+
+// ---------- Delivery ----------
+Delivered POs = CALCULATE ( [PO Count], fact_purchase_order[is_delivered] = TRUE () )
+
+On-Time % =
+DIVIDE (
+    CALCULATE ( [PO Count], fact_purchase_order[on_time] = TRUE () ),
+    [Delivered POs]
+)
+
+Avg Lead Time (days) = AVERAGE ( fact_purchase_order[lead_time_days] )
+
+Avg Delay When Late (days) =
+CALCULATE ( AVERAGE ( fact_purchase_order[delay_days] ), fact_purchase_order[on_time] = FALSE () )
+
+Open POs = CALCULATE ( [PO Count], fact_purchase_order[is_delivered] = FALSE () )
+
+// ---------- Invoices & quality ----------
+Invoice Match % =
+DIVIDE ( CALCULATE ( [PO Count], fact_purchase_order[invoice_match] = TRUE () ), [PO Count] )
+
+Overbilled Amount =
+CALCULATE (
+    SUM ( fact_purchase_order[invoice_gap_mad] ),
+    fact_purchase_order[invoice_match] = FALSE (),
+    fact_purchase_order[invoice_gap_mad] > 0
+)
+
+Quality Issue % =
+DIVIDE ( CALCULATE ( [PO Count], fact_purchase_order[quality_issue] = TRUE () ), [PO Count] )
+
+// ---------- Supplier scorecard ----------
+// Score /100: on-time 40%, quality 30%, invoice accuracy 30%
+Supplier Score =
+IF (
+    NOT ISBLANK ( [PO Count] ),
+    100 * ( 0.4 * [On-Time %] + 0.3 * ( 1 - [Quality Issue %] ) + 0.3 * [Invoice Match %] )
+)
+
+Score Color =
+SWITCH (
+    TRUE (),
+    ISBLANK ( [Supplier Score] ), BLANK (),
+    [Supplier Score] < 70, "#D62828",
+    [Supplier Score] < 85, "#FF7900",
+    "#2A9D8F"
+)
+
+Off-Contract Spend % =
+DIVIDE (
+    CALCULATE ( [Total Spend], dim_supplier[has_framework_contract] = FALSE () ),
+    [Total Spend]
+)
+
+// Pareto: share of spend carried by this supplier and every supplier above it
+Cumulative Spend % =
+VAR CurrentSpend = [Total Spend]
+VAR Cumulative =
+    SUMX (
+        FILTER ( ALLSELECTED ( dim_supplier[supplier_id] ), [Total Spend] >= CurrentSpend ),
+        [Total Spend]
+    )
+RETURN
+    DIVIDE ( Cumulative, CALCULATE ( [Total Spend], ALLSELECTED ( dim_supplier[supplier_id] ) ) )
+
+Suppliers for 80% of Spend =
+COUNTROWS (
+    FILTER ( VALUES ( dim_supplier[supplier_id] ), [Cumulative Spend %] <= 0.8 )
+) + 1
+
+// ---------- Budget ----------
+Budget = SUM ( fact_budget[budget_mad] )
+
+Budget Consumed % = DIVIDE ( [Total Spend], [Budget] )
+
+Budget Variance = [Total Spend] - [Budget]
+
+Departments Over Budget =
+COUNTROWS ( FILTER ( VALUES ( dim_department[department] ), [Budget Consumed %] > 1 ) )
+
+Budget Color = IF ( [Budget Consumed %] > 1, "#D62828", IF ( [Budget Consumed %] > 0.9, "#FF7900", "#A8B2C1" ) )
+
+// ---------- Data quality ----------
+DQ Checks = COUNTROWS ( dq_results )
+
+DQ Checks Passed = CALCULATE ( COUNTROWS ( dq_results ), dq_results[status] = "PASS" )
+
+DQ Rows Fixed = CALCULATE ( SUM ( dq_results[rows_failed] ), dq_results[status] = "FAIL" )
+
+DQ Status Color =
+SWITCH ( SELECTEDVALUE ( dq_results[status] ), "PASS", "#2A9D8F", "WARN", "#FF7900", "FAIL", "#D62828" )
+
+// ---------- Dynamic headline (Card / Text box) ----------
+Attention Headline =
+FORMAT ( [Overbilled Amount] / 1e6, "0.0" ) & " M MAD invoiced above PO · "
+    & [Departments Over Budget] & " department(s) over budget · "
+    & [Suppliers for 80% of Spend] & " suppliers carry 80% of spend"

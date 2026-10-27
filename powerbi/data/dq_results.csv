@@ -1,0 +1,7 @@
+check_id,rule,rows_failed,pct_failed,status
+DQ-001,PO id is unique,30,0.5,FAIL
+DQ-002,PO amount is positive,12,0.2,FAIL
+DQ-003,Department is filled,25,0.41,FAIL
+DQ-004,Supplier exists in master data,0,0.0,PASS
+DQ-005,Promised date is after order date,0,0.0,PASS
+DQ-006,Invoice matches PO amount (±1%),618,10.25,WARN

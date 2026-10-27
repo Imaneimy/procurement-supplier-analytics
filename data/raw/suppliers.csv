@@ -1,0 +1,46 @@
+supplier_id,supplier_name,category,city,has_framework_contract
+SUP001,Supplier 001,Network Equipment,Fes,True
+SUP002,Supplier 002,IT Hardware,Casablanca,True
+SUP003,Supplier 003,Software Licences,Rabat,True
+SUP004,Supplier 004,Telecom Infrastructure,Fes,True
+SUP005,Supplier 005,Facility Services,Rabat,True
+SUP006,Supplier 006,Marketing & Events,Rabat,True
+SUP007,Supplier 007,Consulting,Rabat,False
+SUP008,Supplier 008,Network Equipment,Rabat,True
+SUP009,Supplier 009,IT Hardware,Fes,True
+SUP010,Supplier 010,Software Licences,Casablanca,True
+SUP011,Supplier 011,Telecom Infrastructure,Tangier,True
+SUP012,Supplier 012,Facility Services,Casablanca,True
+SUP013,Supplier 013,Marketing & Events,Casablanca,True
+SUP014,Supplier 014,Consulting,Agadir,True
+SUP015,Supplier 015,Network Equipment,Casablanca,True
+SUP016,Supplier 016,IT Hardware,Casablanca,True
+SUP017,Supplier 017,Software Licences,Paris,True
+SUP018,Supplier 018,Telecom Infrastructure,Rabat,True
+SUP019,Supplier 019,Facility Services,Casablanca,True
+SUP020,Supplier 020,Marketing & Events,Rabat,True
+SUP021,Supplier 021,Consulting,Casablanca,True
+SUP022,Supplier 022,Network Equipment,Casablanca,False
+SUP023,Supplier 023,IT Hardware,Madrid,True
+SUP024,Supplier 024,Software Licences,Paris,True
+SUP025,Supplier 025,Telecom Infrastructure,Rabat,True
+SUP026,Supplier 026,Facility Services,Casablanca,True
+SUP027,Supplier 027,Marketing & Events,Paris,True
+SUP028,Supplier 028,Consulting,Agadir,True
+SUP029,Supplier 029,Network Equipment,Paris,True
+SUP030,Supplier 030,IT Hardware,Fes,False
+SUP031,Supplier 031,Software Licences,Marrakech,True
+SUP032,Supplier 032,Telecom Infrastructure,Casablanca,True
+SUP033,Supplier 033,Facility Services,Paris,True
+SUP034,Supplier 034,Marketing & Events,Casablanca,True
+SUP035,Supplier 035,Consulting,Rabat,True
+SUP036,Supplier 036,Network Equipment,Fes,True
+SUP037,Supplier 037,IT Hardware,Madrid,True
+SUP038,Supplier 038,Software Licences,Casablanca,True
+SUP039,Supplier 039,Telecom Infrastructure,Agadir,True
+SUP040,Supplier 040,Facility Services,Fes,True
+SUP041,Supplier 041,Marketing & Events,Rabat,True
+SUP042,Supplier 042,Consulting,Fes,False
+SUP043,Supplier 043,Network Equipment,Agadir,True
+SUP044,Supplier 044,IT Hardware,Casablanca,True
+SUP045,Supplier 045,Software Licences,Tangier,True
